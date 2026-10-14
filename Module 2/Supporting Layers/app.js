@@ -15,7 +15,7 @@
  *
  * Run it with:  npm start
  */
-
+const config = require('./config');
 const express = require('express');
 const articlesRouter = require('./routes/articles');
 const errorHandler = require('./middleware/errorHandler');
@@ -28,7 +28,7 @@ app.use('/articles', articlesRouter);
 app.use(errorHandler);
 
 // TODO: this process.env read should move into config/index.js, then import it.
-const PORT = process.env.PORT || 3000;
+const PORT =config.port;
 app.listen(PORT, () => {
   console.log(`articles-api listening on http://localhost:${PORT}`);
 });
