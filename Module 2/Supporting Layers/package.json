@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Supporting Layers assignment — refactor a scattered Express API into validators/, utils/, and config/.",
   "main": "app.js",
+   "type": "commonjs",
   "scripts": {
     "start": "node app.js"
   },

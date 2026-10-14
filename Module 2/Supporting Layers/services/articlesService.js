@@ -7,7 +7,7 @@
  *   - process.env.MAX_ARTICLES is read directly here. It should move into
  *     config/index.js and be imported as config.maxArticles.
  */
-
+const config = require('../config');
 const repo = require('./../repository/articlesRepo');
 
 // DUPLICATED definition — should move to utils/AppError.js
@@ -20,7 +20,7 @@ class AppError extends Error {
 }
 
 // INLINE process.env read — should move to config/index.js (config.maxArticles)
-const MAX_ARTICLES = parseInt(process.env.MAX_ARTICLES) || 50;
+const MAX_ARTICLES = config.maxArticles;
 
 exports.getAll = async () => repo.findAll();
 
