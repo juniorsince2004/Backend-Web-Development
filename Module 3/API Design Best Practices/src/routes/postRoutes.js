@@ -9,3 +9,4 @@ router.post('/createPost', controller.createPost);
 router.post('/likePost/:id', controller.likePost);
 
 module.exports = router;
+
