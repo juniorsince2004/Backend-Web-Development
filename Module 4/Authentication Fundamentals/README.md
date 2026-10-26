@@ -1,4 +1,4 @@
-# Authentication Fundamentals Starter
+# Authentication Fundamentals
 
 ## Setup
 
@@ -9,11 +9,11 @@ npm run db:push
 npm start
 ```
 
-Implement register and login behavior in the TODO-marked service functions. The SQLite datasource keeps local setup self-contained. Do not commit `.env` or `prisma/dev.db`.
+The SQLite datasource keeps local setup self-contained. `.env.example` contains development defaults; do not commit `.env` or `prisma/dev.db`.
 
 ## Endpoints
 
-- `POST /auth/register`
-- `POST /auth/login`
+- `POST /auth/register` accepts non-empty `name`, `email`, and `password` strings. Email is trimmed and lowercased; passwords are stored as asynchronous bcrypt hashes. A successful request returns `201` with `id`, `name`, and `email`. A duplicate email returns `409`.
+- `POST /auth/login` accepts non-empty `email` and `password` strings. A successful request returns `200` with `id`, `name`, and `email`. Unknown emails and incorrect passwords both return `401` with the same generic invalid-credentials response.
 
-Use the platform assignment for required request, response, and security behavior.
+Malformed JSON or invalid fields return `400`; unexpected errors return a generic `500`. Passwords and password hashes are never included in responses.
