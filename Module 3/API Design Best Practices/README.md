@@ -33,6 +33,30 @@ npm install
 npm start
 ```
 
+Run the API contract tests with `npm test`.
+
+## API Contract
+
+All successful responses use a `data` property. Errors use an `error` object
+with a stable `code` and a client-safe `message`.
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `GET` | `/posts?page=1&limit=2` | List posts with pagination metadata |
+| `GET` | `/posts/:id` | Fetch one post |
+| `POST` | `/posts` | Create a post with `title` and `author`; returns `201` |
+| `POST` | `/posts/:id/likes` | Add one like to a post |
+| `GET` | `/demo/internal-error` | Trigger a safe generic internal-error response |
+
+The list response is `{ "data": [...], "meta": { ... } }`. Pagination defaults
+to page `1` and limit `2`; the server caps `limit` at `5`. Metadata includes
+`total`, `totalPages`, and the next/previous page values and flags.
+
+Single-resource and create responses are `{ "data": { ... } }`. Error
+responses are `{ "error": { "code": "...", "message": "..." } }`. Internal
+details are kept out of public error bodies. The old verb-based routes are not
+registered.
+
 ## Useful Hints
 
 - Let **HTTP method** carry action. Let **URI** name resource.

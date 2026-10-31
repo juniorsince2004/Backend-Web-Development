@@ -1,21 +1,39 @@
-# Database Integration Assignment Starter
+# Database Integration
 
-Replace the in-memory repository implementation with PostgreSQL through Prisma. The starter already uses an asynchronous repository contract so services and controllers can remain stable during the swap.
+The Posts API persists data in PostgreSQL through Prisma. Services and controllers
+continue to use the repository contract; Prisma is confined to the database client
+and repository implementation.
 
-## Run
+## Local setup
 
-```bash
-npm install
-npm start
-```
+1. Install PostgreSQL and create a local `community_dev` database.
+2. Copy `.env.example` to `.env` and set `DATABASE_URL` to credentials for that
+   local database. Never commit `.env` or use production credentials in this file.
+3. Install dependencies and generate the Prisma Client:
 
-## Prisma preparation
+   ```powershell
+   npm install
+   npm run prisma:generate
+   ```
 
-Copy `.env.example` to `.env` with a local PostgreSQL URL. The schema is intentionally incomplete for the assignment.
+4. Apply the committed migrations and optionally add the repeatable sample data:
 
-```bash
-npm run prisma:format
-npm run prisma:validate
-```
+   ```powershell
+   npm run db:migrate
+   npm run db:seed
+   ```
 
-Read the platform question before editing. Do not add platform-only `question.md`, answer files, tests, or specs to this repository. Never commit `.env` or real credentials.
+5. Start the API with `npm start`.
+
+The seed command upserts one sample user and two sample posts without replacing
+existing records. It can be rerun safely. To reset local data, use a dedicated
+disposable development database and recreate that database before applying
+migrations; do not run reset operations against shared or production databases.
+
+## Prisma commands
+
+- `npm run prisma:format` formats `prisma/schema.prisma`.
+- `npm run prisma:validate` validates the schema against `DATABASE_URL`.
+- `npm run prisma:generate` generates the Prisma Client.
+- `npm run db:migrate` applies committed migrations to the configured database.
+- `npm run db:seed` inserts the repeatable sample records.
