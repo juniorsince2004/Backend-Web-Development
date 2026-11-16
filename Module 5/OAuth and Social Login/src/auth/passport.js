@@ -46,19 +46,51 @@ const { users, nextId } = require('../data');
 // ───────────────────────────────────────────────────────────────────────────────
 async function verifyCallback(accessToken, refreshToken, profile, done) {
   // Replace this stub with your implementation.
-  return done(null, false);
-}
+  try {
+    // Extract only the permitted Google profile fields
+    const googleId = profile.id;
+    const email = profile.emails[0].value;
+    const name = profile.displayName;
+    const existingGoogleUser = users.find(
+      (user) => user.googleId === googleId
+    );
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID:     process.env.GOOGLE_CLIENT_ID     || 'test-client-id',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'test-client-secret',
-      callbackURL:  '/auth/google/callback',
-    },
-    verifyCallback,
-  ),
-);
+    if (existingGoogleUser) {
+      return done(null, existingGoogleUser);
+    }
+
+   const existingEmailUser = users.find(
+      (user) => user.email === email
+    );
+
+    if (existingEmailUser) {
+      // Never link an unverified email
+      if (profile._json.email_verified !== true) {
+        return done(null, false);
+      }
+
+      // Link the Google account to the existing user
+      existingEmailUser.googleId = googleId;
+
+      return done(null, existingEmailUser);
+    }
+  
+     const newUser = {
+      id: nextId(),
+      googleId,
+      email,
+      name,
+      role: 'member'
+    };
+
+    users.push(newUser);
+
+    return done(null, newUser);
+
+  } catch (err) {
+    return done(err);
+  }
+};
 
 // verifyCallback is exported so tests can call it directly without a real browser.
 module.exports = { passport, verifyCallback };
