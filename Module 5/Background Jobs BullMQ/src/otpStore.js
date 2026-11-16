@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('crypto');
 // ─── YOUR FILE, implement this ───────────────────────────────────────────────
 // In-memory OTP store for email verification.
 //
@@ -35,19 +36,45 @@
 const store = new Map();
 
 function generateOTP() {
-  throw new Error('not implemented');
+  return crypto.randomInt(100000, 1000000).toString();
 }
 
 function storeOTP(email, otp) {
-  throw new Error('not implemented');
+  store.set(email, {
+    otp,
+    expiresAt: Date.now() + 10 * 60 * 1000,
+    attempts: 0,
+  });
 }
 
 function verifyOTP(email, code) {
-  throw new Error('not implemented');
+    const entry = store.get(email);
+
+  if (!entry) {
+    return { ok: false, reason: 'not_found' };
+  }
+
+  if (Date.now() > entry.expiresAt) {
+    store.delete(email);
+    return { ok: false, reason: 'expired' };
+  }
+
+  if (entry.attempts >= 3) {
+    return { ok: false, reason: 'too_many_attempts' };
+  }
+
+  if (entry.otp !== String(code)) {
+    entry.attempts++;
+    return { ok: false, reason: 'wrong_code' };
+  }
+
+  store.delete(email);
+
+  return { ok: true };
 }
 
 function markVerified(email) {
-  throw new Error('not implemented');
+  console.log(`Email verified successfully: ${email}`);
 }
 
 module.exports = { generateOTP, storeOTP, verifyOTP, markVerified, _store: store };
