@@ -22,5 +22,28 @@
 // Hint: express-rate-limit returns a middleware function — export it directly:
 //   const rateLimit = require('express-rate-limit');
 //   module.exports = rateLimit({ ...options });
+const rateLimit = require("express-rate-limit");
 
-module.exports = (req, res, next) => next(); // TODO: replace this stub
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Maximum 5 failed attempts per IP
+
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  skipSuccessfulRequests: true,
+
+  handler: (req, res) => {
+    const retryAfter = Math.ceil(
+      (req.rateLimit.resetTime.getTime() - Date.now()) / 1000
+    );
+
+    res.set("Retry-After", String(Math.max(1, retryAfter)));
+
+    return res.status(429).json({
+      error: "Too many requests. Please try again later.",
+    });
+  },
+});
+
+module.exports = authLimiter;
